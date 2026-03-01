@@ -1,0 +1,5 @@
+{
+  "name": "Humanitarian Project Management System",
+  "description": "A comprehensive tool for managing humanitarian projects through their lifecycle, from pipeline to activation, closure, or rejection, including activity tracking, financial installments, and reporting.",
+  "requestFramePermissions": []
+}
