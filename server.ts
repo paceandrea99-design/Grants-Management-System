@@ -146,6 +146,7 @@ async function startServer() {
         ...r,
         technical_people: JSON.parse(r.technical_people || "[]")
       }));
+      const meetings = db.prepare("SELECT * FROM meetings WHERE project_id = ?").all(p.id);
       return {
         ...p,
         regions: JSON.parse(p.regions || "[]"),
@@ -157,7 +158,8 @@ async function startServer() {
         has_partners: !!p.has_partners,
         activities,
         installments,
-        reports
+        reports,
+        meetings
       };
     }));
   });
@@ -367,6 +369,11 @@ async function startServer() {
       regions: JSON.parse(m.regions || "[]"),
       partners: JSON.parse(m.partners || "[]"),
     })));
+  });
+
+  app.delete("/api/meetings/:id", (req, res) => {
+    db.prepare("DELETE FROM meetings WHERE id = ?").run(req.params.id);
+    res.json({ success: true });
   });
 
   app.get("/api/installments", (req, res) => {

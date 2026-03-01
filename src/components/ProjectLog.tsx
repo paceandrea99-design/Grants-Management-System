@@ -335,6 +335,7 @@ export default function ProjectLog({ projects, title, onEdit, refresh }: Project
         isOpen={isMeetingModalOpen} 
         onClose={() => setIsMeetingModalOpen(false)} 
         projectId={selectedProjectId} 
+        onSuccess={refresh}
       />
 
       <DeleteConfirmModal

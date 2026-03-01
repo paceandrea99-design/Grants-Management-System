@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from 'react';
-import { Calendar, Clock, MapPin, Tag, Briefcase, Users, Globe, ArrowUpDown, Search, X } from 'lucide-react';
+import { Calendar, Clock, MapPin, Tag, Briefcase, Users, Globe, ArrowUpDown, Search, X, Trash2 } from 'lucide-react';
 import { Meeting, Project } from '../types';
 import { cn } from '../lib/utils';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 interface MeetingsLogProps {
   projects: Project[];
+  onUpdate?: () => void;
 }
 
-export default function MeetingsLog({ projects }: MeetingsLogProps) {
+export default function MeetingsLog({ projects, onUpdate }: MeetingsLogProps) {
   const [loading, setLoading] = useState(false);
   const [sortField, setSortField] = useState<keyof Meeting>('date');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [searchTerm, setSearchTerm] = useState('');
   const [typeFilter, setTypeFilter] = useState('');
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedMeetingId, setSelectedMeetingId] = useState<number | null>(null);
 
   const meetings = projects.flatMap(p => (p.meetings || []).map(m => ({
     ...m,
@@ -46,6 +50,26 @@ export default function MeetingsLog({ projects }: MeetingsLogProps) {
     } else {
       setSortField(field);
       setSortDirection('asc');
+    }
+  };
+
+  const handleDeleteClick = (id: number) => {
+    setSelectedMeetingId(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  const deleteMeeting = async () => {
+    if (!selectedMeetingId) return;
+    try {
+      const res = await fetch(`/api/meetings/${selectedMeetingId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        onUpdate?.();
+        setIsDeleteModalOpen(false);
+      }
+    } catch (err) {
+      console.error('Failed to delete meeting', err);
     }
   };
 
@@ -120,6 +144,7 @@ export default function MeetingsLog({ projects }: MeetingsLogProps) {
               <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sectors & Areas</th>
               <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Partners</th>
               <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider">Project Status</th>
+              <th className="px-6 py-4 text-[10px] font-bold text-slate-500 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
@@ -182,6 +207,15 @@ export default function MeetingsLog({ projects }: MeetingsLogProps) {
                     {meeting.project_status}
                   </span>
                 </td>
+                <td className="px-6 py-5 text-right">
+                  <button 
+                    onClick={() => handleDeleteClick(meeting.id!)}
+                    className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                    title="Delete Meeting"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </td>
               </tr>
             ))}
             {meetings.length === 0 ? (
@@ -203,6 +237,14 @@ export default function MeetingsLog({ projects }: MeetingsLogProps) {
           </tbody>
         </table>
       </div>
+
+      <DeleteConfirmModal
+        isOpen={isDeleteModalOpen}
+        onClose={() => setIsDeleteModalOpen(false)}
+        onConfirm={deleteMeeting}
+        title="Delete Meeting"
+        message="Are you sure you want to delete this meeting record? This action cannot be undone."
+      />
     </div>
   );
 }

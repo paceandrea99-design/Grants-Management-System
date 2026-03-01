@@ -6,13 +6,14 @@ interface MeetingModalProps {
   isOpen: boolean;
   onClose: () => void;
   projectId: number | null;
+  onSuccess?: () => void;
 }
 
-export default function MeetingModal({ isOpen, onClose, projectId }: MeetingModalProps) {
+export default function MeetingModal({ isOpen, onClose, projectId, onSuccess }: MeetingModalProps) {
   const [formData, setFormData] = useState({
     date: '',
     time: '',
-    type: 'Coordination'
+    type: 'Grant opening meeting'
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -26,6 +27,7 @@ export default function MeetingModal({ isOpen, onClose, projectId }: MeetingModa
         body: JSON.stringify({ ...formData, project_id: projectId })
       });
       if (res.ok) {
+        onSuccess?.();
         onClose();
       }
     } catch (err) {

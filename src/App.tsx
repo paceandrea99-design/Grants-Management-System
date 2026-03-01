@@ -317,7 +317,7 @@ export default function App() {
               {activeView === 'active' && <ProjectLog projects={projects.filter(p => p.status === 'Active')} title="Active Projects" onEdit={handleEditProject} refresh={fetchProjects} />}
               {activeView === 'closed' && <ProjectLog projects={projects.filter(p => p.status === 'Closed')} title="Closed Projects" onEdit={handleEditProject} refresh={fetchProjects} />}
               {activeView === 'rejected' && <ProjectLog projects={projects.filter(p => p.status === 'Rejected')} title="Rejected Projects" onEdit={handleEditProject} refresh={fetchProjects} />}
-              {activeView === 'meetings' && <MeetingsLog projects={projects} />}
+              {activeView === 'meetings' && <MeetingsLog projects={projects} onUpdate={fetchProjects} />}
               {activeView === 'installments' && <InstallmentsLog projects={projects} onUpdate={fetchProjects} />}
               {activeView === 'reports' && <ReportsLog projects={projects} onUpdate={fetchProjects} />}
               {activeView === 'cheatsheet' && <CheatSheetView projects={projects.filter(p => p.status === 'Active')} />}
